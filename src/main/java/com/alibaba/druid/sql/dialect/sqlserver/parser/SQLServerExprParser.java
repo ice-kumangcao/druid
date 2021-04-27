@@ -24,6 +24,7 @@ import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerOutput;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerTop;
+import com.alibaba.druid.sql.dialect.sqlserver.ast.expr.SQLServerCollateExpr;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.expr.SQLServerObjectReferenceExpr;
 import com.alibaba.druid.sql.parser.Lexer;
 import com.alibaba.druid.sql.parser.SQLExprParser;
@@ -87,7 +88,15 @@ public class SQLServerExprParser extends SQLExprParser {
             return primaryRest(name);
         }
 
-        return super.primary();
+        SQLExpr expr = super.primary();
+        if (lexer.identifierEquals(FnvHash.Constants.COLLATE)) {
+            lexer.nextToken();
+            SQLServerCollateExpr collateExpr = new SQLServerCollateExpr(expr, lexer.stringVal());
+            expr.setParent(collateExpr);
+            lexer.nextToken();
+            return collateExpr;
+        }
+        return expr;
     }
 
     public SQLServerSelectParser createSelectParser() {
@@ -111,6 +120,12 @@ public class SQLServerExprParser extends SQLExprParser {
                 seq.setFunction(SQLSequenceExpr.Function.NextVal);
                 expr = seq;
             }
+        } else if (lexer.identifierEquals(FnvHash.Constants.COLLATE)) {
+            lexer.nextToken();
+            SQLServerCollateExpr collateExpr = new SQLServerCollateExpr(expr, lexer.stringVal());
+            expr.setParent(collateExpr);
+            expr = collateExpr;
+            lexer.nextToken();
         }
 
         return super.primaryRest(expr);

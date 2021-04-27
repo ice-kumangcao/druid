@@ -21,6 +21,7 @@ import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLSequenceExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.*;
+import com.alibaba.druid.sql.dialect.sqlserver.ast.expr.SQLServerCollateExpr;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.expr.SQLServerObjectReferenceExpr;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.stmt.*;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.stmt.SQLServerExecStatement.SQLServerParameter;
@@ -639,6 +640,19 @@ public class SQLServerOutputVisitor extends SQLASTOutputVisitor implements SQLSe
         if ((x.getAlias() != null) && (x.getAlias().length() > 0)) {
             print0(ucase ? " AS " : " as ");
             print0(x.getAlias());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean visit(SQLServerCollateExpr x) {
+        if (x.getExpr() != null) {
+            x.getExpr().accept(this);
+        }
+        if (x.getCollate() != null && x.getCollate().length() > 0) {
+            print(' ');
+            print0(ucase ? "COLLATE " : "collate ");
+            print0(x.getCollate());
         }
         return false;
     }

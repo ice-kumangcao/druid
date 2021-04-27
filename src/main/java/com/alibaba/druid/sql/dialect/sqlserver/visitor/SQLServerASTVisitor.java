@@ -18,6 +18,7 @@ package com.alibaba.druid.sql.dialect.sqlserver.visitor;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.*;
+import com.alibaba.druid.sql.dialect.sqlserver.ast.expr.SQLServerCollateExpr;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.expr.SQLServerObjectReferenceExpr;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.stmt.*;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.stmt.SQLServerExecStatement.SQLServerParameter;
@@ -110,4 +111,8 @@ public interface SQLServerASTVisitor extends SQLASTVisitor {
     default boolean visit(SQLServerSelectPivot.Item x) { return true; }
 
     default void endVisit(SQLServerSelectPivot.Item x) {}
+
+    default boolean visit(SQLServerCollateExpr x) { return true; }
+
+    default void endVisit(SQLServerCollateExpr x) {}
 }
